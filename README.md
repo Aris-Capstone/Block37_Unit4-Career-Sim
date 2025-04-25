@@ -2,4 +2,5 @@
 career sim for backend 
 
 Schema on Whimsical
-![image](https://github.com/user-attachments/assets/82bc2952-dd5b-46f0-8908-71e8a11d671b)
+![image](https://github.com/user-attachments/assets/d55a5d99-c1fe-4501-9b45-008168f45c3f)
+
