@@ -19,36 +19,56 @@ const seed = async () => {
         console.log('Tables created');
 
         // Create users and products
-        const [admin, johnDoe, janeSmith, Castle, Walt, Disneyland, Ferris_Wheel] = await Promise.all([
+        const [belle, ariel, jasmine, mickeyMouse, minnieMouse, castleShirt, waltMickeyTank, disneylandSweatshirt, ferrisWheelSweatshirt, mickeyPlush] = await Promise.all([
             createUser({
-                username: 'admin',
-                password: 'admin123',
+                username: 'belle_princess',
+                password: 'beauty123',
                 is_admin: true,
-                name: 'Admin User',
-                email: 'admin@example.com',
-                mailing_address: '123 Admin St',
+                name: 'Princess Belle',
+                email: 'belle@disney.com',
+                mailing_address: '1 Beauty Way',
                 phone: '555-0001',
-                billing_address: '123 Admin St'
+                billing_address: '1 Beauty Way'
             }),
             createUser({
-                username: 'john_doe',
-                password: 'password123',
+                username: 'ariel_princess',
+                password: 'under123',
                 is_admin: false,
-                name: 'John Doe',
-                email: 'john@example.com',
-                mailing_address: '456 Main St',
+                name: 'Princess Ariel',
+                email: 'ariel@disney.com',
+                mailing_address: '2 Under the Sea',
                 phone: '555-0002',
-                billing_address: '456 Main St'
+                billing_address: '2 Under the Sea'
             }),
             createUser({
-                username: 'jane_smith',
-                password: 'password123',
+                username: 'jasmine_princess',
+                password: 'agrabah123',
                 is_admin: false,
-                name: 'Jane Smith',
-                email: 'jane@example.com',
-                mailing_address: '789 Oak St',
+                name: 'Princess Jasmine',
+                email: 'jasmine@disney.com',
+                mailing_address: '3 Agrabah Palace',
                 phone: '555-0003',
-                billing_address: '789 Oak St'
+                billing_address: '3 Agrabah Palace'
+            }),
+            createUser({
+                username: 'mickey_mouse',
+                password: 'disney123',
+                is_admin: false,
+                name: 'Mickey Mouse',
+                email: 'mickey@disney.com',
+                mailing_address: '1 Disney Way',
+                phone: '555-0004',
+                billing_address: '1 Disney Way'
+            }),
+            createUser({
+                username: 'minnie_mouse',
+                password: 'disney123',
+                is_admin: false,
+                name: 'Minnie Mouse',
+                email: 'minnie@disney.com',
+                mailing_address: '2 Disney Way',
+                phone: '555-0005',
+                billing_address: '2 Disney Way'
             }),
             createProduct({
                 name: 'Disney Castle Shirt',
@@ -73,25 +93,41 @@ const seed = async () => {
                 description: 'Disney sweatshirt with Disney Ferris wheel on the front',
                 image_url: 'https://unsplash.com/photos/multicolored-ferris-wheel-during-nighttime-XptxqeT0Wo4',
                 price: 39.99
+            }),
+            createProduct({
+                name: 'Disney Mickey Mouse Plush',
+                description: 'Official Disney Mickey Mouse plush toy, 12 inches tall',
+                image_url: 'https://unsplash.com/photos/red-blue-and-yellow-balloons-xOhzHKCAhVs',
+                price: 29.99
             })
         ]);
         console.log('Users and products created');
 
         // Create cart items
-        const [johnCastle, adminWalt, janeDisneyland] = await Promise.all([
+        const [belleCastle, arielWalt, jasmineDisneyland, mickeyPlushCart, minnieFerris] = await Promise.all([
             createUserCart({
-                user_id: johnDoe.id,
-                product_id: Castle.id,
+                user_id: belle.id,
+                product_id: castleShirt.id,
                 quantity: 1
             }),
             createUserCart({
-                user_id: admin.id,
-                product_id: Walt.id,
+                user_id: ariel.id,
+                product_id: waltMickeyTank.id,
                 quantity: 2
             }),
             createUserCart({
-                user_id: janeSmith.id,
-                product_id: Disneyland.id,
+                user_id: jasmine.id,
+                product_id: disneylandSweatshirt.id,
+                quantity: 1
+            }),
+            createUserCart({
+                user_id: mickeyMouse.id,
+                product_id: mickeyPlush.id,
+                quantity: 1
+            }),
+            createUserCart({
+                user_id: minnieMouse.id,
+                product_id: ferrisWheelSweatshirt.id,
                 quantity: 1
             })
         ]);
