@@ -8,7 +8,7 @@ const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/b
 
 const createTables = async () => {
     const SQL = `
-        DROP TABLE IF EXISTS user_products;
+        DROP TABLE IF EXISTS user_cart;
         DROP TABLE IF EXISTS users;
         DROP TABLE IF EXISTS products;
 
@@ -24,7 +24,7 @@ const createTables = async () => {
             id UUID PRIMARY KEY,
             username VARCHAR(255) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
-            is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+            is_admin BOOLEAN DEFAULT FALSE,
             name VARCHAR(255) NOT NULL,
             email VARCHAR(255),
             mailing_address VARCHAR(255) NOT NULL,
@@ -32,7 +32,7 @@ const createTables = async () => {
             billing_address VARCHAR(255)
         );
 
-        CREATE TABLE user_products(
+        CREATE TABLE user_cart(
             id UUID PRIMARY KEY,
             user_id UUID REFERENCES users(id) NOT NULL,
             product_id UUID REFERENCES products(id) NOT NULL,
@@ -44,87 +44,89 @@ const createTables = async () => {
     await client.query(SQL);
 };
 
-const createUser = async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await client.query('INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *', [email, hashedPassword]);
-        res.status(201).json(user.rows[0]);
-    } catch (error) {
-        next(error);
-    }
+//create functions
+const createUser = async ({ username, password, name, mailing_address }) => {
+    const SQL = `INSERT INTO users(id, username, password, name, mailing_address) 
+                 VALUES($1, $2, $3, $4, $5) RETURNING *;`;
+    const hashed_password = await bcrypt.hash(password, 5);
+
+    const response = await client.query(SQL, [
+        uuid.v4(),
+        username,
+        hashed_password,
+        name,
+        mailing_address
+    ]);
+
+    return response.rows[0];
 };
 
-const createProduct = async (req, res, next) => {
-    try {
-        const { name, description, image_url, price } = req.body;
-        const product = await client.query('INSERT INTO products (name, description, image_url, price) VALUES ($1, $2, $3, $4) RETURNING *', [name, description, image_url, price]);
-        res.status(201).json(product.rows[0]);
-    } catch (error) {
-        next(error);
-    }
+const createProduct = async ({ name, description, image_url, price }) => {
+    const SQL = `INSERT INTO products(id, name, description, image_url, price) 
+                 VALUES($1, $2, $3, $4, $5) RETURNING *;`;
+
+    const response = await client.query(SQL, [
+        uuid.v4(),
+        name,
+        description,
+        image_url,
+        price
+    ]);
+
+    return response.rows[0];
 };
 
-const createUserCart = async (req, res, next) => {
-    try {
-        const { user_id, product_id, quantity } = req.body;
-        const userProduct = await client.query('INSERT INTO user_products (user_id, product_id, quantity) VALUES ($1, $2, $3) RETURNING *', [user_id, product_id, quantity]);
-        res.status(201).json(userProduct.rows[0]);
-    } catch (error) {
-        next(error);
-    }
+const createUserCart = async ({ user_id, product_id, quantity }) => {
+    const SQL = `INSERT INTO user_cart(id, user_id, product_id, quantity) 
+                 VALUES($1, $2, $3, $4) RETURNING *;`;
+
+    const response = await client.query(SQL, [
+        uuid.v4(),
+        user_id,
+        product_id,
+        quantity
+    ]);
+
+    return response.rows[0];
 };
 
-const getProducts = async (req, res, next) => {
-    try {
-        const products = await client.query('SELECT * FROM products');
-        res.status(200).json(products.rows);
-    } catch (error) {
-        next(error);
-    }
+//fetch functions
+const fetchProducts = async () => {
+    const SQL = `SELECT * FROM products;`;
+    const response = await client.query(SQL);
+    return response.rows;
 };
 
-const getUserCart = async (req, res, next) => {
-    try {
-        const { user_id } = req.params;
-        const userProducts = await client.query('SELECT * FROM user_products WHERE user_id = $1', [user_id]);
-        res.status(200).json(userProducts.rows);
-    } catch (error) {
-        next(error);
-    }
+const fetchUserCart = async (user_id) => {
+    const SQL = `SELECT * FROM user_cart WHERE user_id = $1;`;
+    const response = await client.query(SQL, [user_id]);
+    return response.rows;
 };
 
-
-const updateUserCart = async (req, res, next) => {
-    try {
-        const { user_id, product_id } = req.params;
-        const { quantity } = req.body;
-        const userProduct = await client.query('UPDATE user_products SET quantity = $1 WHERE user_id = $2 AND product_id = $3', [quantity, user_id, product_id]);
-        res.status(200).json(userProduct.rows[0]);
-    } catch (error) {
-        next(error);
-    }
+const fetchUser = async (user_id) => {
+    const SQL = `SELECT * FROM users WHERE id = $1;`;
+    const response = await client.query(SQL, [user_id]);
+    return response.rows[0];
 };
 
-const deleteUserCart = async (req, res, next) => {
-    try {
-        const { user_id, product_id } = req.params;
-        const userProduct = await client.query('DELETE FROM user_products WHERE user_id = $1 AND product_id = $2', [user_id, product_id]);
-        res.status(200).json(userProduct.rows[0]);
-    } catch (error) {
-        next(error);
-    }
+//update and delete functions
+
+const updateUserCart = async (user_id, product_id, { quantity }) => {
+    const SQL = `UPDATE user_cart SET quantity = $1 
+                 WHERE user_id = $2 AND product_id = $3 
+                 RETURNING *;`;
+    const response = await client.query(SQL, [quantity, user_id, product_id]);
+    return response.rows[0];
 };
 
-const getUser = async (req, res, next) => {
-    try {
-        const { user_id } = req.params;
-        const user = await client.query('SELECT * FROM users WHERE id = $1', [user_id]);
-        res.status(200).json(user.rows[0]);
-    } catch (error) {
-        next(error);
-    }
+const deleteUserCart = async (user_id, product_id) => {
+    const SQL = `DELETE FROM user_cart 
+                 WHERE user_id = $1 AND product_id = $2 
+                 RETURNING *;`;
+    const response = await client.query(SQL, [user_id, product_id]);
+    return response.rows[0];
 };
+
 
 
 module.exports = {
@@ -133,9 +135,9 @@ module.exports = {
     createUser,
     createProduct,
     createUserCart,
-    getProducts,
-    getUserCart,
+    fetchProducts,
+    fetchUserCart,
     updateUserCart,
     deleteUserCart,
-    getUser
+    fetchUser
 };

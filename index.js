@@ -4,11 +4,11 @@ const {
     createUser,
     createProduct,
     createUserCart,
-    getProducts,
-    getUserCart,
+    fetchProducts,
+    fetchUserCart,
     updateUserCart,
     deleteUserCart,
-    getUser
+    fetchUser
 } = require('./db');
 
 const express = require('express');
@@ -30,6 +30,15 @@ const auth = (req, res, next) => {
     next();
 };
 
+app.get('/api/user/:user_id', isLoggedIn, async (req, res, next) => {
+    try {
+        const user = await fetchUser(req.params.user_id);
+        res.json(user);
+    } catch (err) {
+        next(err);
+    }
+});
+
 // Public endpoints (no auth required)
 app.post('/api/users', async (req, res, next) => {
     try {
@@ -49,6 +58,16 @@ const isLoggedIn = (req, res, next) => {
 };
 
 // Protected endpoints (require auth)
+
+app.get('/api/products', async (req, res, next) => {
+    try {
+        const products = await fetchProducts();
+        res.json(products);
+    } catch (err) {
+        next(err);
+    }
+});
+
 app.post('/api/products', isLoggedIn, async (req, res, next) => {
     try {
         const product = await createProduct(req, res, next);
@@ -58,18 +77,9 @@ app.post('/api/products', isLoggedIn, async (req, res, next) => {
     }
 });
 
-app.get('/api/products', async (req, res, next) => {
-    try {
-        const products = await getProducts();
-        res.json(products);
-    } catch (err) {
-        next(err);
-    }
-});
-
 app.get('/api/user-cart/:user_id', isLoggedIn, async (req, res, next) => {
     try {
-        const userCart = await getUserCart(req.params.user_id);
+        const userCart = await fetchUserCart(req.params.user_id);
         res.json(userCart);
     } catch (err) {
         next(err);
@@ -102,14 +112,7 @@ app.delete('/api/user-cart/:user_id/:product_id', isLoggedIn, async (req, res, n
         next(err);
     }
 });
-app.get('/api/user/:user_id', isLoggedIn, async (req, res, next) => {
-    try {
-        const user = await getUser(req.params.user_id);
-        res.json(user);
-    } catch (err) {
-        next(err);
-    }
-});
+
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: err.message });
