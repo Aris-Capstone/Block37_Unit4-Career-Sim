@@ -8,118 +8,124 @@ const {
     fetchUserCart,
     updateUserCart,
     deleteUserCart,
+    authenticate,
+    findUserWithToken,
     fetchUser
 } = require('./db');
 
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const app = express();
-app.use(express.json());
 const morgan = require('morgan');
-app.use(morgan('dev'));
+const express = require('express');
 
-const JWT = process.env.JWT || 'shhh';
+const server = express();
+client.connect();
 
-const auth = (req, res, next) => {
-    const token = req.headers.authorization;
-    if (!token) {
-        return res.status(401).json({ message: 'Unauthorized' });
+server.use(express.json());
+server.use(morgan('dev'));
+
+//for deployment only
+const path = require('path');
+server.get('/', (req, res) => res.sendFile(path.join(__dirname, '../client/dist/index.html')));
+
+server.use('/assets', express.static(path.join(__dirname, '../client/dist/assets')));
+
+const port = process.env.PORT || 3000;
+server.listen(port, () => console.log(`Server is running on port ${port}`));
+
+//const JWT = process.env.JWT || 'shhh';
+
+
+const isLoggedIn = async (req, res, next) => {
+    try {
+        req.user = await findUserWithToken(req.headers.authorization);
+        next();
+    } catch (err) {
+        next(err);
     }
-    const decoded = jwt.verify(token, JWT);
-    req.user = decoded;
-    next();
 };
 
-app.get('/api/user/:user_id', isLoggedIn, async (req, res, next) => {
+// Public routes (no auth required)
+server.get('/api/products', async (req, res, next) => {
     try {
-        const user = await fetchUser(req.params.user_id);
-        res.json(user);
+        res.send(await fetchProducts());
     } catch (err) {
         next(err);
     }
 });
 
-// Public endpoints (no auth required)
-app.post('/api/users', async (req, res, next) => {
+server.post('/api/users', async (req, res, next) => {
     try {
-        const user = await createUser(req, res, next);
-        res.json(user);
+        res.send(await createUser(req.body));
     } catch (err) {
         next(err);
     }
 });
 
-app.use(auth);
-const isLoggedIn = (req, res, next) => {
-    if (!req.user) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-    next();
-};
+// Apply auth middleware to all routes after this point
+server.use(authenticate);
 
-// Protected endpoints (require auth)
-
-app.get('/api/products', async (req, res, next) => {
+// Protected routes (require auth)
+server.get('/api/user/:user_id', isLoggedIn, async (req, res, next) => {
     try {
-        const products = await fetchProducts();
-        res.json(products);
+        res.send(await fetchUser(req.params.user_id));
     } catch (err) {
         next(err);
     }
 });
 
-app.post('/api/products', isLoggedIn, async (req, res, next) => {
+server.post('/api/products', isLoggedIn, async (req, res, next) => {
     try {
-        const product = await createProduct(req, res, next);
-        res.json(product);
+        res.send(await createProduct(req.body));
     } catch (err) {
         next(err);
     }
 });
 
-app.get('/api/user-cart/:user_id', isLoggedIn, async (req, res, next) => {
+server.get('/api/user-cart/:user_id', isLoggedIn, async (req, res, next) => {
     try {
-        const userCart = await fetchUserCart(req.params.user_id);
-        res.json(userCart);
+        if (req.params.user_id !== req.user.id) {
+            const error = Error('Unauthorized');
+            error.status = 401;
+            throw error;
+        }
+        res.send(await fetchUserCart(req.params.user_id));
     } catch (err) {
         next(err);
     }
 });
 
-app.post('/api/user-cart', isLoggedIn, async (req, res, next) => {
+server.post('/api/user-cart', isLoggedIn, async (req, res, next) => {
     try {
-        const userCart = await createUserCart(req.body);
-        res.json(userCart);
+        res.send(await createUserCart(req.body));
     } catch (err) {
         next(err);
     }
 });
 
-app.put('/api/user-cart/:user_id/:product_id', isLoggedIn, async (req, res, next) => {
+server.put('/api/user-cart/:user_id/:product_id', isLoggedIn, async (req, res, next) => {
     try {
-        const userCart = await updateUserCart(req.params.user_id, req.params.product_id, req.body);
-        res.json(userCart);
+        res.send(await updateUserCart(req.params.user_id, req.params.product_id, req.body));
     } catch (err) {
         next(err);
     }
 });
-app.delete('/api/user-cart/:user_id/:product_id', isLoggedIn, async (req, res, next) => {
+
+server.delete('/api/user-cart/:user_id/:product_id', isLoggedIn, async (req, res, next) => {
     try {
-        const userCart = await deleteUserCart(req.params.user_id, req.params.product_id);
+        if (req.params.user_id !== req.user.id) {
+            const error = Error('Unauthorized');
+            error.status = 401;
+            throw error;
+        }
+        await deleteUserCart(req.params.user_id, req.params.product_id);
         res.sendStatus(204);
-        res.json(userCart);
     } catch (err) {
         next(err);
     }
 });
 
-app.use((err, req, res, next) => {
+server.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: err.message });
-});
-
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
 });
 
 const init = async () => {
@@ -136,11 +142,6 @@ const init = async () => {
     ]);
     console.log('User and product created');
 
-
-
-    app.listen(port, () => {
-        console.log(`Server is running on port ${port}`);
-    });
 };
 
 init();

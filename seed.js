@@ -17,20 +17,21 @@ const seed = async () => {
     await createTables();
     console.log('Tables created');
 
+    //create users
     const [belle, ariel, jasmine, mickey, minnie, castleShirt, waltMickeyTank, disneylandSweatshirt, ferrisWheelSweatshirt, mickeyPlush] = await Promise.all([
         createUser({
             username: 'belle_princess',
-            password: 'beauty123',
+            password: 'beast123',
             is_admin: true,
             name: 'Princess Belle',
-            email: 'bell@disney.com',
+            email: 'belle@disney.com',
             mailing_address: '1 Beauty Way',
-            phone: '555-0001',
+            phone: '123-4567',
             billing_address: '1 Beauty Way'
         }),
         createUser({
             username: 'ariel_princess',
-            password: 'under123',
+            password: 'flounder123',
             is_admin: false,
             name: 'Princess Ariel',
             email: 'ariel@disney.com',
@@ -44,9 +45,9 @@ const seed = async () => {
             is_admin: false,
             name: 'Princess Jasmine',
             email: 'jasmine@disney.com',
-            mailing_address: '3 Agrabah Palace',
-            phone: '555-0003',
-            billing_address: '3 Agrabah Palace'
+            mailing_address: '3 Raja Palace',
+            phone: '408-5508',
+            billing_address: '3 Raja Palace'
         }),
         createUser({
             username: 'mickey_mouse',
@@ -55,7 +56,7 @@ const seed = async () => {
             name: 'Mickey Mouse',
             email: 'mickey@disney.com',
             mailing_address: '1 Disney Way',
-            phone: '555-0004',
+            phone: '768-9000',
             billing_address: '1 Disney Way'
         }),
         createUser({
@@ -65,10 +66,11 @@ const seed = async () => {
             name: 'Minnie Mouse',
             email: 'minnie@disney.com',
             mailing_address: '2 Disney Way',
-            phone: '555-0005',
+            phone: '768-9001',
             billing_address: '2 Disney Way'
         }),
 
+        //create products   
         createProduct({
             name: 'Disney Castle Shirt',
             description: 'Disney shirt with Castle on the front',
@@ -107,6 +109,7 @@ const seed = async () => {
     console.log('Products created');
     console.log(await fetchProducts());
 
+    //create user carts
     const [user_cart] = await Promise.all([
         createUserCart(belle.id, castleShirt.id, 1),
         createUserCart(ariel.id, waltMickeyTank.id, 2),

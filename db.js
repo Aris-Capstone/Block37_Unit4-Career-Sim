@@ -46,14 +46,12 @@ const createTables = async () => {
 
 //create functions
 const createUser = async ({ username, password, name, mailing_address }) => {
-    const SQL = `INSERT INTO users(id, username, password, name, mailing_address) 
-                 VALUES($1, $2, $3, $4, $5) RETURNING *;`;
-    const hashed_password = await bcrypt.hash(password, 5);
+    const SQL = `INSERT INTO users(id, username, password, name, mailing_address) VALUES($1, $2, $3, $4, $5) RETURNING *;`;
 
     const response = await client.query(SQL, [
         uuid.v4(),
         username,
-        hashed_password,
+        await bcrypt.hash(password, 5),
         name,
         mailing_address
     ]);
@@ -62,8 +60,7 @@ const createUser = async ({ username, password, name, mailing_address }) => {
 };
 
 const createProduct = async ({ name, description, image_url, price }) => {
-    const SQL = `INSERT INTO products(id, name, description, image_url, price) 
-                 VALUES($1, $2, $3, $4, $5) RETURNING *;`;
+    const SQL = `INSERT INTO products(id, name, description, image_url, price) VALUES($1, $2, $3, $4, $5) RETURNING *;`;
 
     const response = await client.query(SQL, [
         uuid.v4(),
@@ -77,8 +74,7 @@ const createProduct = async ({ name, description, image_url, price }) => {
 };
 
 const createUserCart = async ({ user_id, product_id, quantity }) => {
-    const SQL = `INSERT INTO user_cart(id, user_id, product_id, quantity) 
-                 VALUES($1, $2, $3, $4) RETURNING *;`;
+    const SQL = `INSERT INTO user_cart(id, user_id, product_id, quantity) VALUES($1, $2, $3, $4) RETURNING *;`;
 
     const response = await client.query(SQL, [
         uuid.v4(),
@@ -123,10 +119,34 @@ const deleteUserCart = async (user_id, product_id) => {
     const SQL = `DELETE FROM user_cart 
                  WHERE user_id = $1 AND product_id = $2 
                  RETURNING *;`;
-    const response = await client.query(SQL, [user_id, product_id]);
-    return response.rows[0];
+    await client.query(SQL, [user_id, product_id]);
 };
 
+const authenticate = async ({ username, password }) => {
+    const SQL = `
+      SELECT id, username FROM users WHERE username=$1;
+    `;
+    const response = await client.query(SQL, [username]);
+    if (!response.rows.length) {
+        const error = Error('not authorized');
+        error.status = 401;
+        throw error;
+    }
+    return { token: response.rows[0].id };
+};
+
+const findUserWithToken = async (id) => {
+    const SQL = `
+      SELECT id, username FROM users WHERE id=$1;
+    `;
+    const response = await client.query(SQL, [id]);
+    if (!response.rows.length) {
+        const error = Error('not authorized');
+        error.status = 401;
+        throw error;
+    }
+    return response.rows[0];
+};
 
 
 module.exports = {
@@ -139,5 +159,7 @@ module.exports = {
     fetchUserCart,
     updateUserCart,
     deleteUserCart,
+    authenticate,
+    findUserWithToken,
     fetchUser
 };
