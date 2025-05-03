@@ -56,31 +56,31 @@ const seed = async () => {
         createProduct(
             'Disney Castle Shirt',
             'Disney shirt with Castle on the front',
-            'https://unsplash.com/photos/brown-and-blue-castle-under-cloudy-sky-during-daytime-Lmd-CpZOGWc',
+            'https://images.unsplash.com/photo-1509407336566-fca158fddcce?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8ZGlzbmV5fGVufDB8fDB8fHww',
             19.99
         ),
         createProduct(
             'Walt & Mickey Tank',
             'Disney tank top with Walt and Mickey on the front',
-            'https://unsplash.com/photos/man-holding-rat-concrete-statue-DUgYdLxVEPM',
+            'https://images.unsplash.com/photo-1530908158103-e2d2bf40c235?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGRpc25leXxlbnwwfHwwfHx8MA%3D%3D',
             16.99
         ),
         createProduct(
             'Disneyland Sweatshirt',
             'Disney sweatshirt with Disneyland on the front',
-            'https://unsplash.com/photos/a-building-with-a-sign-that-says-disneyland-on-it-CAvg_0FEMCo',
+            'https://images.unsplash.com/photo-1551454211-35c47de27645?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGRpc25leXxlbnwwfHwwfHx8MA%3D%3D',
             29.99
         ),
         createProduct(
             'Disney Ferris Wheel Sweatshirt',
             'Disney sweatshirt with Disney Ferris wheel on the front',
-            'https://unsplash.com/photos/multicolored-ferris-wheel-during-nighttime-XptxqeT0Wo4',
+            'https://images.unsplash.com/photo-1588882929086-51acd6e39954?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fGRpc25leXxlbnwwfHwwfHx8MA%3D%3D',
             39.99
         ),
         createProduct(
             'Disney Mickey Mouse Plush',
             'Official Disney Mickey Mouse plush toy, 12 inches tall',
-            'https://example.com/mickey-plush.jpg',
+            'https://images.unsplash.com/photo-1581909199603-0de32b43ffd2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGRpc25leXxlbnwwfHwwfHx8MA%3D%3D',
             29.99
         )
     ]);

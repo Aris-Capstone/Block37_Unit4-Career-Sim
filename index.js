@@ -17,6 +17,7 @@ const {
 
 const bcrypt = require('bcryptjs');
 
+const cors = require("cors");
 const morgan = require('morgan');
 const express = require('express');
 const jwt = require('jsonwebtoken');
@@ -24,6 +25,7 @@ const jwt = require('jsonwebtoken');
 const server = express();
 client.connect();
 
+server.use(cors());
 server.use(express.json());
 server.use(morgan('dev'));
 
