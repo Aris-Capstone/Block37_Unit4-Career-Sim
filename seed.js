@@ -5,10 +5,12 @@ const {
     createProduct,
     createUserCart,
     fetchUserCart,
-    deleteUserCart
+    deleteUserCart,
+    fetchUsers,
+    fetchProducts
 } = require('./db');
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const seed = async () => {
     await client.connect();
@@ -19,88 +21,68 @@ const seed = async () => {
 
     //create users
     const [belle, ariel, jasmine, mickey, minnie, castleShirt, waltMickeyTank, disneylandSweatshirt, ferrisWheelSweatshirt, mickeyPlush] = await Promise.all([
-        createUser({
-            username: 'belle_princess',
-            password: 'beast123',
-            is_admin: true,
-            name: 'Princess Belle',
-            email: 'belle@disney.com',
-            mailing_address: '1 Beauty Way',
-            phone: '123-4567',
-            billing_address: '1 Beauty Way'
-        }),
-        createUser({
-            username: 'ariel_princess',
-            password: 'flounder123',
-            is_admin: false,
-            name: 'Princess Ariel',
-            email: 'ariel@disney.com',
-            mailing_address: '2 Under the Sea',
-            phone: '555-0002',
-            billing_address: '2 Under the Sea'
-        }),
-        createUser({
-            username: 'jasmine_princess',
-            password: 'agrabah123',
-            is_admin: false,
-            name: 'Princess Jasmine',
-            email: 'jasmine@disney.com',
-            mailing_address: '3 Raja Palace',
-            phone: '408-5508',
-            billing_address: '3 Raja Palace'
-        }),
-        createUser({
-            username: 'mickey_mouse',
-            password: 'disney123',
-            is_admin: false,
-            name: 'Mickey Mouse',
-            email: 'mickey@disney.com',
-            mailing_address: '1 Disney Way',
-            phone: '768-9000',
-            billing_address: '1 Disney Way'
-        }),
-        createUser({
-            username: 'minnie_mouse',
-            password: 'disney123',
-            is_admin: false,
-            name: 'Minnie Mouse',
-            email: 'minnie@disney.com',
-            mailing_address: '2 Disney Way',
-            phone: '768-9001',
-            billing_address: '2 Disney Way'
-        }),
+        createUser(
+            'belle_princess',
+            'beast123',
+            'Princess Belle',
+            '1 Beauty Way'
+        ),
+        createUser(
+            'ariel_princess',
+            'flounder123',
+            'Princess Ariel',
+            '2 Under the Sea'
+        ),
+        createUser(
+            'jasmine_princess',
+            'agrabah123',
+            'Princess Jasmine',
+            '3 Raja Palace'
+        ),
+        createUser(
+            'mickey_mouse',
+            'disney123',
+            'Mickey Mouse',
+            '1 Disney Way'
+        ),
+        createUser(
+            'minnie_mouse',
+            'disney123',
+            'Minnie Mouse',
+            '2 Disney Way'
+        ),
 
         //create products   
-        createProduct({
-            name: 'Disney Castle Shirt',
-            description: 'Disney shirt with Castle on the front',
-            image_url: 'https://unsplash.com/photos/brown-and-blue-castle-under-cloudy-sky-during-daytime-Lmd-CpZOGWc',
-            price: 19.99
-        }),
-        createProduct({
-            name: 'Walt & Mickey Tank',
-            description: 'Disney tank top with Walt and Mickey on the front',
-            image_url: 'https://unsplash.com/photos/man-holding-rat-concrete-statue-DUgYdLxVEPM',
-            price: 16.99
-        }),
-        createProduct({
-            name: 'Disneyland Sweatshirt',
-            description: 'Disney sweatshirt with Disneyland on the front',
-            image_url: 'https://unsplash.com/photos/a-building-with-a-sign-that-says-disneyland-on-it-CAvg_0FEMCo',
-            price: 29.99
-        }),
-        createProduct({
-            name: 'Disney Ferris Wheel Sweatshirt',
-            description: 'Disney sweatshirt with Disney Ferris wheel on the front',
-            image_url: 'https://unsplash.com/photos/multicolored-ferris-wheel-during-nighttime-XptxqeT0Wo4',
-            price: 39.99
-        }),
-        createProduct({
-            name: 'Disney Mickey Mouse Plush',
-            description: 'Official Disney Mickey Mouse plush toy, 12 inches tall',
-            image_url: 'https://example.com/mickey-plush.jpg',
-            price: 29.99
-        })
+        createProduct(
+            'Disney Castle Shirt',
+            'Disney shirt with Castle on the front',
+            'https://unsplash.com/photos/brown-and-blue-castle-under-cloudy-sky-during-daytime-Lmd-CpZOGWc',
+            19.99
+        ),
+        createProduct(
+            'Walt & Mickey Tank',
+            'Disney tank top with Walt and Mickey on the front',
+            'https://unsplash.com/photos/man-holding-rat-concrete-statue-DUgYdLxVEPM',
+            16.99
+        ),
+        createProduct(
+            'Disneyland Sweatshirt',
+            'Disney sweatshirt with Disneyland on the front',
+            'https://unsplash.com/photos/a-building-with-a-sign-that-says-disneyland-on-it-CAvg_0FEMCo',
+            29.99
+        ),
+        createProduct(
+            'Disney Ferris Wheel Sweatshirt',
+            'Disney sweatshirt with Disney Ferris wheel on the front',
+            'https://unsplash.com/photos/multicolored-ferris-wheel-during-nighttime-XptxqeT0Wo4',
+            39.99
+        ),
+        createProduct(
+            'Disney Mickey Mouse Plush',
+            'Official Disney Mickey Mouse plush toy, 12 inches tall',
+            'https://example.com/mickey-plush.jpg',
+            29.99
+        )
     ]);
 
     console.log('Users created');
@@ -129,6 +111,8 @@ const seed = async () => {
 
 
     await client.end();
+
+    console.log("data seeded")
 };
 
 seed();

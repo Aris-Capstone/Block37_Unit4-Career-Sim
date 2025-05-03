@@ -1,6 +1,6 @@
 const pg = require('pg');
 const uuid = require('uuid');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const JWT = process.env.JWT || 'shhh';
 
@@ -45,7 +45,7 @@ const createTables = async () => {
 };
 
 //create functions
-const createUser = async ({ username, password, name, mailing_address }) => {
+const createUser = async (username, password, name, mailing_address) => {
     const SQL = `INSERT INTO users(id, username, password, name, mailing_address) VALUES($1, $2, $3, $4, $5) RETURNING *;`;
 
     const response = await client.query(SQL, [
@@ -59,7 +59,7 @@ const createUser = async ({ username, password, name, mailing_address }) => {
     return response.rows[0];
 };
 
-const createProduct = async ({ name, description, image_url, price }) => {
+const createProduct = async (name, description, image_url, price) => {
     const SQL = `INSERT INTO products(id, name, description, image_url, price) VALUES($1, $2, $3, $4, $5) RETURNING *;`;
 
     const response = await client.query(SQL, [
@@ -73,7 +73,7 @@ const createProduct = async ({ name, description, image_url, price }) => {
     return response.rows[0];
 };
 
-const createUserCart = async ({ user_id, product_id, quantity }) => {
+const createUserCart = async (user_id, product_id, quantity) => {
     const SQL = `INSERT INTO user_cart(id, user_id, product_id, quantity) VALUES($1, $2, $3, $4) RETURNING *;`;
 
     const response = await client.query(SQL, [
@@ -87,6 +87,12 @@ const createUserCart = async ({ user_id, product_id, quantity }) => {
 };
 
 //fetch functions
+const fetchProduct = async (product_id) => {
+    const SQL = `SELECT * FROM products WHERE id = $1;`;
+    const response = await client.query(SQL, [product_id]);
+    return response.rows[0];
+};
+
 const fetchProducts = async () => {
     const SQL = `SELECT * FROM products;`;
     const response = await client.query(SQL);
@@ -103,6 +109,12 @@ const fetchUser = async (user_id) => {
     const SQL = `SELECT * FROM users WHERE id = $1;`;
     const response = await client.query(SQL, [user_id]);
     return response.rows[0];
+};
+
+const fetchUsers = async () => {
+    const SQL = `SELECT * FROM users;`;
+    const response = await client.query(SQL);
+    return response.rows;
 };
 
 //update and delete functions
@@ -122,23 +134,31 @@ const deleteUserCart = async (user_id, product_id) => {
     await client.query(SQL, [user_id, product_id]);
 };
 
+//authentication uodated- need to verify  
+
 const authenticate = async ({ username, password }) => {
     const SQL = `
-      SELECT id, username FROM users WHERE username=$1;
+      SELECT id, password FROM users WHERE username=$1;
     `;
     const response = await client.query(SQL, [username]);
-    if (!response.rows.length) {
+    if (
+        !response.rows.length ||
+        (await bcrypt.compare(password, response.rows[0].password)) === false
+    ) {
         const error = Error('not authorized');
         error.status = 401;
         throw error;
     }
-    return { token: response.rows[0].id };
+    const token = await jwt.sign({ id: response.rows[0].id }, JWT);
+    return { token };
 };
 
-const findUserWithToken = async (id) => {
+//findUserWithToken updated- need to verify
+const findUserWithToken = async (token) => {
     const SQL = `
       SELECT id, username FROM users WHERE id=$1;
     `;
+    const { id } = jwt.verify(token, JWT);
     const response = await client.query(SQL, [id]);
     if (!response.rows.length) {
         const error = Error('not authorized');
@@ -157,9 +177,11 @@ module.exports = {
     createUserCart,
     fetchProducts,
     fetchUserCart,
+    fetchProduct,
     updateUserCart,
     deleteUserCart,
     authenticate,
     findUserWithToken,
-    fetchUser
+    fetchUser,
+    fetchUsers
 };
