@@ -20,7 +20,7 @@ const seed = async () => {
     console.log('Tables created');
 
     //create users
-    const [belle, ariel, jasmine, mickey, minnie, castleShirt, waltMickeyTank, disneylandSweatshirt, ferrisWheelSweatshirt, mickeyPlush] = await Promise.all([
+    const [belle, ariel, jasmine, mickey, minnie, castleShirt, waltMickeyTank, disneylandSweatshirt, ferrisWheelSweatshirt, mickeyPlush, woodyBaseballHat, simbaTShirt, dopeyMug] = await Promise.all([
         createUser(
             'belle_princess',
             'beast123',
@@ -82,6 +82,24 @@ const seed = async () => {
             'Official Disney Mickey Mouse plush toy, 12 inches tall',
             'https://images.unsplash.com/photo-1581909199603-0de32b43ffd2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGRpc25leXxlbnwwfHwwfHx8MA%3D%3D',
             29.99
+        ),
+        createProduct(
+            'Toy Story Woody Baseball Hat',
+            'Baseball hat with Woody from Toy Story',
+            'https://images.unsplash.com/photo-1616097970275-1e187b4ce59f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8ZGlzbmV5JTIwY2hhcmFjdGVyc3xlbnwwfHwwfHx8MA%3D%3D',
+            17.99
+        ),
+        createProduct(
+            'Lion King Simba T-Shirt',
+            'T-shirt featuring Simba from The Lion King',
+            'https://images.unsplash.com/photo-1647194104720-25d09b297910?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGRpc25leSUyMGNoYXJhY3RlcnN8ZW58MHx8MHx8fDA%3D',
+            21.99
+        ),
+        createProduct(
+            'Dopey Mug',
+            'Ceramic mug with Dopey from Snow White',
+            'https://images.unsplash.com/photo-1699787868013-f60da1d014ac?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGRpc25leSUyMGNoYXJhY3RlcnN8ZW58MHx8MHx8fDA%3D',
+            14.99
         )
     ]);
 

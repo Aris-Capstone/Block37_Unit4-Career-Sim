@@ -80,7 +80,7 @@ server.get('/api/products/:product_id', async (req, res, next) => {
 
 
 // authenticate endpoint created- need to verify
-server.post('api/users/auth', async (req, res, next) => {
+server.post('api/users/login', async (req, res, next) => {
     try {
         res.send(await authenticate({ username, password }))
     } catch (err) {
