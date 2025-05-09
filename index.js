@@ -80,9 +80,25 @@ server.get('/api/products/:product_id', async (req, res, next) => {
 
 
 // authenticate endpoint created- need to verify
-server.post('api/users/login', async (req, res, next) => {
+server.post('api/login', async (req, res, next) => {
     try {
-        res.send(await authenticate({ username, password }))
+        const { username, password } = req.body;
+        if (!username || !password) {
+            next({
+                name: "Missing credentials",
+                message: "Please provide a username and password",
+            });
+            return;
+        }
+        const user = await authenticate({ username, password });
+        if (!user) {
+            next({
+                name: "Invalid username or password",
+                message: "Please check your login and try again- invalid username or password",
+            });
+            return;
+        }
+        res.send(user);
     } catch (err) {
         next(err);
     }
