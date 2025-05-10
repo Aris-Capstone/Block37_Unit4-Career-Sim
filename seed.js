@@ -25,7 +25,8 @@ const seed = async () => {
             'belle_princess',
             'beast123',
             'Princess Belle',
-            '1 Beauty Way'
+            '1 Beauty Way',
+            true
         ),
         createUser(
             'ariel_princess',

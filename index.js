@@ -80,7 +80,7 @@ server.get('/api/products/:product_id', async (req, res, next) => {
 
 
 // authenticate endpoint created- need to verify
-server.post('api/login', async (req, res, next) => {
+server.post('/api/login', async (req, res, next) => {
     try {
         const { username, password } = req.body;
         if (!username || !password) {
