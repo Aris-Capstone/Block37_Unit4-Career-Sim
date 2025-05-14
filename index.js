@@ -114,7 +114,7 @@ server.get('/api/users/:user_id', isLoggedIn, async (req, res, next) => {
     }
 });
 
-server.get('/api/users', isLoggedIn, async (req, res, next) => {
+server.get('/api/admin_users', isLoggedIn, async (req, res, next) => {
     try {
         res.send(await fetchUsers());
     } catch (err) {

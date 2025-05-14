@@ -139,7 +139,7 @@ const deleteUserCart = async (user_id, product_id) => {
 
 const authenticate = async ({ username, password }) => {
     const SQL = `
-      SELECT id, password FROM users WHERE username=$1;
+      SELECT *FROM users WHERE username=$1;
     `;
     const response = await client.query(SQL, [username]);
     if (
@@ -151,7 +151,7 @@ const authenticate = async ({ username, password }) => {
         throw error;
     }
     const token = await jwt.sign({ id: response.rows[0].id }, JWT);
-    return { token };
+    return { token, user: response.rows[0] };
 };
 
 //findUserWithToken updated- need to verify
