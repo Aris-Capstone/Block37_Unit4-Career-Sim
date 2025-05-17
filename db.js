@@ -3,13 +3,14 @@ const uuid = require('uuid');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const JWT = process.env.JWT || 'shhh';
+require("dotenv").config();
 
 const connectionString = process.env.DATABASE_URL || 'postgres://localhost/backend_product_store_db'
 
 const client = new pg.Client({
     connectionString,
     ssl:
-        process.env.NODE_ENV === "production"
+        process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging"
             ? { rejectUnauthorized: false }
             : undefined,
 });
