@@ -29,11 +29,6 @@ server.use(cors());
 server.use(express.json());
 server.use(morgan('dev'));
 
-//for deployment only
-const path = require('path');
-server.get('/', (req, res) => res.sendFile(path.join(__dirname, '../client/dist/index.html')));
-
-server.use('/assets', express.static(path.join(__dirname, '../client/dist/assets')));
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => console.log(`Server is running on port ${port}`));
